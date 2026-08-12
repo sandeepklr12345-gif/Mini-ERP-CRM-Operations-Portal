@@ -1,0 +1,33 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Vite
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Coverage
+coverage/
