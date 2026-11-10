@@ -1,0 +1,10 @@
+# AI assistant tooling
+.agents/
+.claude/
+.windsurf/
+.cursor/
+
+# Env and deps
+.env
+node_modules/
+dist/
