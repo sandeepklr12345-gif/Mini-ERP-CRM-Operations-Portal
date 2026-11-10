@@ -13,6 +13,7 @@ The Mini ERP + CRM Operations Portal unifies customer management, product catalo
 ## 📌 Table of Contents
 
 - [Overview](#-overview)
+- [Screenshots](#-screenshots)
 - [Key Features](#-key-features)
 - [Business Workflow](#-business-workflow)
 - [System Architecture](#-system-architecture)
@@ -43,6 +44,22 @@ This project addresses that challenge through a unified operations portal.
 - Transactional inventory updates to help prevent inconsistent stock records.
 
 **Project objective:** Demonstrate how a modular full-stack application can connect CRM and ERP workflows while enforcing business rules at the backend.
+
+## 🖼️ Screenshots
+
+Captured from the running application with the seeded demo data.
+
+| Dashboard | Inventory |
+|---|---|
+| ![Dashboard with customer, product, low-stock and challan counts](docs/screenshots/dashboard.png) | ![Inventory with In Stock, Low Stock and Out of Stock status](docs/screenshots/inventory.png) |
+
+| Sales challans | Challan detail |
+|---|---|
+| ![Sales challans list](docs/screenshots/challans.png) | ![Confirmed challan with line items and totals](docs/screenshots/challan-detail.png) |
+
+| Customers | Sign in |
+|---|---|
+| ![Customers list](docs/screenshots/customers.png) | ![Sign-in page](docs/screenshots/login.png) |
 
 ## ✨ Key Features
 
@@ -245,99 +262,68 @@ The exact model names should be checked against `backend/prisma/schema.prisma` b
 
 ### Prerequisites
 
-Install the following:
+- Node.js 20+ and npm
+- PostgreSQL 14+ (or Docker, to use the bundled `docker-compose.yml`)
 
-- Node.js and npm.
-- PostgreSQL.
-- Git.
-
-### 1. Clone the repository
+### 1. Clone and start a database
 
 ```bash
 git clone https://github.com/sandeepklr12345-gif/Mini-ERP-CRM-Operations-Portal.git
 cd Mini-ERP-CRM-Operations-Portal
+docker compose up -d        # PostgreSQL on localhost:5432 (set POSTGRES_PORT=5433 if 5432 is taken)
 ```
 
-### 2. Configure the backend
+Using your own PostgreSQL instead? Create a database and put its connection string in `DATABASE_URL` below.
+
+### 2. Backend (http://localhost:5000)
 
 ```bash
 cd backend
 npm install
-```
-
-Create a backend `.env` file and configure the required environment variables using the next section.
-
-### 3. Configure the database
-
-Create a PostgreSQL database and provide its connection string through `DATABASE_URL`.
-
-Then run the Prisma commands appropriate for the repository's existing migration setup:
-
-```bash
+cp .env.example .env        # set DATABASE_URL and JWT_SECRET (see Environment Configuration)
 npx prisma generate
-npx prisma migrate deploy
-```
-
-For a new development database without existing migrations, use the project's documented development workflow instead of `migrate deploy`.
-
-### 4. Start the backend
-
-Use the development script defined in `backend/package.json`. For projects configured with `dev` as the development script:
-
-```bash
+npx prisma db push          # creates the tables from prisma/schema.prisma
+npm run prisma:seed         # demo users, a customer and three products
 npm run dev
 ```
 
-The backend has previously been configured to run on:
-
-`http://localhost:5000`
-
-### 5. Configure and start the frontend
-
-Open a second terminal:
+### 3. Frontend (http://localhost:5173)
 
 ```bash
 cd frontend
 npm install
-```
-
-Configure the frontend API base URL to point to the backend. The expected local API base is:
-
-`http://localhost:5000/api`
-
-Start the frontend using its configured Vite development script:
-
-```bash
+echo "VITE_API_URL=http://localhost:5000/api" > .env
 npm run dev
 ```
 
-The frontend has previously been configured to run on:
+Open http://localhost:5173 and sign in with a seeded account (password `Password123!` for all):
 
-`http://localhost:5173`
+| Role | Email |
+|---|---|
+| Admin | `admin@erp.test` |
+| Sales | `sales@erp.test` |
+| Warehouse | `warehouse@erp.test` |
+| Accounts | `accounts@erp.test` |
 
-**Note:** Confirm the actual scripts and environment variable names in each `package.json` and the application's configuration before running these commands.
+These accounts exist only to explore the app locally. Do not use the seed script against a production database.
 
 ## 🔧 Environment Configuration
 
-Keep environment variables in local `.env` files that are excluded from version control.
-
-Typical configuration includes:
-
-**Backend `.env`**
+**`backend/.env`**
 
 ```env
 PORT=5000
-DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/minierp_db"
-JWT_SECRET="REPLACE_WITH_A_STRONG_RANDOM_SECRET"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/mini_erp_crm?schema=public"
+JWT_SECRET="replace-with-a-long-random-string"
+JWT_EXPIRES_IN=8h
+FRONTEND_URL=http://localhost:5173   # CORS origin; must match the address you open in the browser
 ```
 
-**Frontend configuration**
+**`frontend/.env`**
 
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
-
-These names are illustrative and should match the variables read by the current source code.
 
 ### Security checklist
 

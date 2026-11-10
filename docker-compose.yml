@@ -1,0 +1,26 @@
+# Local PostgreSQL for development.
+#   docker compose up -d
+# Then set DATABASE_URL in backend/.env to:
+#   postgresql://postgres:postgres@localhost:5432/mini_erp_crm?schema=public
+# If port 5432 is already used by a local Postgres, start with a different port:
+#   POSTGRES_PORT=5433 docker compose up -d    (and use 5433 in DATABASE_URL)
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mini_erp_crm
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mini_erp_crm"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
